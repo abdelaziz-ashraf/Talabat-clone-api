@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckOwnsAddressMiddleware;
 use App\Http\Responses\ErrorResponse;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
@@ -15,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+       //
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->renderable(function (\Illuminate\Validation\ValidationException $e, $request) {

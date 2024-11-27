@@ -16,6 +16,7 @@ class AddressResource extends JsonResource
     {
         return [
             'id' => (integer)$this->id,
+            'active' => (boolean) $this->active,
             'address' => (string) $this->address,
             'city' => (string) $this->city,
             'longitude' => (float) $this->longitude,

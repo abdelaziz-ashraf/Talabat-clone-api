@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Actions\LocalFileUploader;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AddressRequest;
+use App\Http\Requests\StoreAddressRequest;
 use App\Http\Requests\SetPasswordRequest;
 use App\Http\Requests\VendorLoginRequest;
 use App\Http\Requests\VendorRegisterRequest;
@@ -17,7 +17,7 @@ use Illuminate\Validation\ValidationException;
 class VendorAuthController extends Controller
 {
     public function register(VendorRegisterRequest $request, LocalFileUploader $localFileUploader){
-        $address = new AddressRequest($request->post('address'));
+        $address = new StoreAddressRequest($request->post('address'));
         $data = $request->validated();
 
         $data['image'] = $request->hasFile('image')
