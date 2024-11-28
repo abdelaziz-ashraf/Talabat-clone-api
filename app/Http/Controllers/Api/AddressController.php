@@ -17,10 +17,12 @@ class AddressController extends Controller
     public function index() {
         $addresses = auth('vendor')->user()->addresses()->paginate();
         return SuccessResponse::send('success', AddressResource::collection($addresses), meta:[
-            'total' => $addresses->total(),
-            'per_page' => $addresses->perPage(),
-            'current_page' => $addresses->currentPage(),
-            'last_page' => $addresses->lastPage(),
+            'pagination' => [
+                'total' => $addresses->total(),
+                'per_page' => $addresses->perPage(),
+                'current_page' => $addresses->currentPage(),
+                'last_page' => $addresses->lastPage(),
+            ]
         ]);
     }
 

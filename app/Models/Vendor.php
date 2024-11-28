@@ -30,4 +30,7 @@ class Vendor extends Authenticatable
         return $this->morphMany(Address::class, 'addressable');
     }
 
+    public function categories() {
+        return $this->hasMany(Category::class);
+    }
 }
