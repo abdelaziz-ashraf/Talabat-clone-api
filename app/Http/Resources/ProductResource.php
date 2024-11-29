@@ -20,7 +20,7 @@ class ProductResource extends JsonResource
             'description' => $this['description'],
             'price' => $this['price'],
             'image' => $this['image'],
-            'category' => CategoryResource::make($this['category']),
+            'category' => CategoryResource::make($this->whenLoaded('category')),
             'created_at' => $this['created_at'],
         ];
     }

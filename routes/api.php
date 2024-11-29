@@ -4,7 +4,10 @@ use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\VendorAuthController;
+use App\Http\Controllers\Api\VendorController;
+use App\Http\Middleware\CheckAuthorizationMiddleware;
 use App\Http\Middleware\CheckOwnsAddressMiddleware;
+use App\Http\Middleware\CheckVendorAuthorization;
 use App\Http\Middleware\CheckVendorOwnsCategoryMiddleware;
 use App\Http\Middleware\CheckVendorOwnsProductMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +19,12 @@ Route::prefix('vendor')->group(function () {
         Route::post('login', [VendorAuthController::class, 'login']);
         Route::post('{vendor:code}/set-password', [VendorAuthController::class, 'setPassword']);
     });
+
+    Route::get('/', [VendorController::class, 'index']);
+    Route::get('/{vendor}/menu', [VendorController::class, 'menu']);
+    Route::get('/{vendor}', [VendorController::class, 'show']);
+    Route::put('/{vendor}', [VendorController::class, 'update'])->middleware(CheckAuthorizationMiddleware::class);
+    Route::delete('/{vendor}', [VendorController::class, 'destroy'])->middleware(CheckAuthorizationMiddleware::class);
 
     Route::prefix('categories')->group(function () {
         Route::get('/{category}', [CategoryController::class, 'show']);
