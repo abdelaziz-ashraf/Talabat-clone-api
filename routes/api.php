@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CustomerAuthController;
+use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\VendorAuthController;
 use App\Http\Controllers\Api\VendorController;
@@ -25,10 +26,9 @@ Route::prefix('vendor')->group(function () {
         Route::get('/{vendor}', 'show');
     });
 
-    Route::get('/{vendor}/categories', [CategoryController::class, 'getVendorCategories']);
-    Route::get('/categories/{category}', [CategoryController::class, 'show']);
-
     Route::middleware('auth:vendor')->group(function () {
+        Route::post('/addresses', [AddressController::class, 'storeVendorAddress']);
+
         Route::controller(VendorController::class)->group(function () {
             Route::put('/', 'update');
             Route::delete('/', 'destroy');
@@ -50,6 +50,9 @@ Route::prefix('vendor')->group(function () {
             });
         });
     });
+
+    Route::get('/{vendor}/categories', [CategoryController::class, 'getVendorCategories']);
+    Route::get('/categories/{category}', [CategoryController::class, 'show']);
 });
 
 Route::prefix('customers')->group(function () {
@@ -58,13 +61,21 @@ Route::prefix('customers')->group(function () {
         Route::post('login', 'login');
         Route::post('verifyCode', 'verifyCode');
     });
+
+    Route::middleware('auth:customer')->group(function () {
+        Route::put('/', [CustomerController::class, 'update']);
+        Route::delete('/', [CustomerController::class, 'destroy']);
+        Route::get('/addresses', [AddressController::class, 'customerAddresses']);
+        Route::get('/active-addresses', [AddressController::class, 'customerActiveAddresses']);
+        Route::post('/addresses', [AddressController::class, 'storeCustomerAddress']);
+    });
+
+    Route::get('/{customer}', [CustomerController::class, 'show']);
 });
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:vendor,customer'])->group(function () {
 
     Route::prefix('addresses')->group(function () {
-        Route::get('/', [AddressController::class, 'useAddresses']);
-        Route::post('/', [AddressController::class, 'store']);
         Route::middleware(CheckOwnsAddressMiddleware::class)->group(function () {
             Route::put('/{address}', [AddressController::class, 'update']);
             Route::delete('/{address}', [AddressController::class, 'destroy']);

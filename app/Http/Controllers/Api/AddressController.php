@@ -14,8 +14,8 @@ use Illuminate\Validation\ValidationException;
 
 class AddressController extends Controller
 {
-    public function useAddresses() {
-        $addresses = auth('vendor')->user()->addresses()->paginate();
+    public function customerAddresses() {
+        $addresses = auth('customer')->user()->addresses()->paginate();
         return SuccessResponse::send('success', AddressResource::collection($addresses), meta:[
             'pagination' => [
                 'total' => $addresses->total(),
@@ -26,7 +26,25 @@ class AddressController extends Controller
         ]);
     }
 
-    public function store(StoreAddressRequest $request) {
+    public function customerActiveAddresses() {
+        $addresses = auth('customer')->user()->addresses()->where('active', true)->paginate();
+        return SuccessResponse::send('success', AddressResource::collection($addresses), meta:[
+            'pagination' => [
+                'total' => $addresses->total(),
+                'per_page' => $addresses->perPage(),
+                'current_page' => $addresses->currentPage(),
+                'last_page' => $addresses->lastPage(),
+            ]
+        ]);
+    }
+
+    public function storeCustomerAddress(StoreAddressRequest $request) {
+        $user = auth('customer')->user();
+        $address = $user->addresses()->create($request->validated());
+        return SuccessResponse::send('Address added successfully.', AddressResource::make($address));
+    }
+
+    public function storeVendorAddress(StoreAddressRequest $request) {
         $user = auth('vendor')->user();
         $address = $user->addresses()->create($request->validated());
         return SuccessResponse::send('Address added successfully.', AddressResource::make($address));

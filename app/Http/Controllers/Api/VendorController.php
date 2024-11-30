@@ -37,8 +37,8 @@ class VendorController extends Controller
         if(isset($data['password'])) {
             $data['password'] = Hash::make($data->password);
         }
-        if($request->hasFile('image')) {
-            $data['image'] = $localFileUploader->upload($request->file('image'), 'vendors_images', $vendor->image);
+        if($request->hasFile('image')){
+            $data['image'] = $localFileUploader->upload($request->file('image'), 'vendors_images', $vendor->image ?? null);
         }
         $vendor->update($request->validated());
         return SuccessResponse::send('Vendor details updated successfully.', VendorResource::make($vendor));

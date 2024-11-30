@@ -40,7 +40,6 @@ class ProductController extends Controller
     }
 
     public function update(UpdateProductRequest $request, Product $product, LocalFileUploader $localFileUploader){
-        // ToDo : form-data do not send .
         $data = $request->validated();
         if($request->hasFile('image')){
             $data['image'] = $localFileUploader->upload($request->file('image'), 'products_images', $product->image ?? null);

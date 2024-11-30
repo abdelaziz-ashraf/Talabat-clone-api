@@ -12,6 +12,7 @@ use App\Http\Resources\CustomerResource;
 use App\Http\Responses\SuccessResponse;
 use App\Models\Customer;
 use App\Models\VerificationCode;
+use App\Notifications\EmailVerifiedSuccessfullyNotification;
 use App\Notifications\VerificationCodeNotification;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -66,7 +67,7 @@ class CustomerAuthController extends Controller
         }
 
         $customer->markEmailAsVerified();
-        // Todo : EmailVerifiedSuccessfullyNotification
+        $customer->notify(new EmailVerifiedSuccessfullyNotification());
         $verificationCode->delete();
 
         return SuccessResponse::send('Code verified successfully.');
