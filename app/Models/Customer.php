@@ -2,18 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 
-
-class Vendor extends Authenticatable
+class Customer extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, Notifiable;
 
     protected $fillable = [
-        'name', 'image', 'code', 'password'
+        'name', 'email', 'password', 'email_verified_at'
     ];
 
     protected $hidden = [ 'password', 'remember_token'];
@@ -30,7 +29,4 @@ class Vendor extends Authenticatable
         return $this->morphMany(Address::class, 'addressable');
     }
 
-    public function categories() {
-        return $this->hasMany(Category::class);
-    }
 }

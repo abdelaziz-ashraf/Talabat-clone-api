@@ -53,7 +53,6 @@ class VendorAuthController extends Controller
     }
 
     public function setPassword(SetPasswordRequest $request, Vendor $vendor){
-
         if(!is_null($vendor->password)) {
             throw ValidationException::withMessages(['You set your password before .. change it from your profile if you want.']);
         }

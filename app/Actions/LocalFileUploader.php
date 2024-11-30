@@ -10,7 +10,7 @@ class LocalFileUploader
     public function upload($file, string $path, string $replaceWith = null)
     {
         if ($replaceWith) {
-            $this->deleteFile($replaceWith);
+            $this->deleteFile($path . '/' . $replaceWith);
         }
 
         [$name, $extension] = explode('.', $file->getClientOriginalName());
@@ -22,8 +22,10 @@ class LocalFileUploader
 
     public function deleteFile(string $path)
     {
-        $path = str_replace(asset('uploads'), '', $path);
-        Storage::disk('public_uploads')->delete($path);
+        $filePath = public_path('uploads/' . $path);
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
     }
 
 }

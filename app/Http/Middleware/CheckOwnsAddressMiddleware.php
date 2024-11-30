@@ -16,9 +16,8 @@ class CheckOwnsAddressMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = auth('vendor')->user();
         $address = $request->route('address');
-        if ($user->id !== $address->addressable_id) {
+        if (auth('vendor')->id() !== $address->addressable_id) {
             throw ValidationException::withMessages(['Unauthorized Access.']);
         }
 

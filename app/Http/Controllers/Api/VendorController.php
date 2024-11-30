@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\LocalFileUploader;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateVendorRequest;
 use App\Http\Resources\MenuResource;
@@ -30,19 +31,26 @@ class VendorController extends Controller
         return SuccessResponse::send('Vendor details retrieved successfully.', VendorResource::make($vendor));
     }
 
-    public function update(UpdateVendorRequest $request, Vendor $vendor) {
+    public function update(UpdateVendorRequest $request, LocalFileUploader $localFileUploader) {
+        $vendor = auth('vendor')->user();
         $data = $request->validated();
-        if(isset($data->password)) {
+        if(isset($data['password'])) {
             $data['password'] = Hash::make($data->password);
         }
-        // todo: update image
+        if($request->hasFile('image')) {
+            $data['image'] = $localFileUploader->upload($request->file('image'), 'vendors_images', $vendor->image);
+        }
         $vendor->update($request->validated());
         return SuccessResponse::send('Vendor details updated successfully.', VendorResource::make($vendor));
     }
 
-    public function destroy(Vendor $vendor) {
+    public function destroy(LocalFileUploader $localFileUploader) {
+        $vendor = auth('vendor')->user();
+        $image = isset($vendor->image) ? $vendor->image : null;
         $vendor->delete();
-        // todo: delete image
+        if($image !== null) {
+            $localFileUploader->deleteFile('vendors_images/'.$image);
+        }
         return SuccessResponse::send('Vendor deleted successfully.');
     }
 

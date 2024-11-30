@@ -40,15 +40,20 @@ class ProductController extends Controller
     }
 
     public function update(UpdateProductRequest $request, Product $product, LocalFileUploader $localFileUploader){
+        // ToDo : form-data do not send .
         $data = $request->validated();
-        // todo : Update Image ..
+        if($request->hasFile('image')){
+            $data['image'] = $localFileUploader->upload($request->file('image'), 'products_images', $product->image ?? null);
+        }
         $product->update($data);
         return SuccessResponse::send('Product Updated', ProductResource::make($product));
     }
 
-    public function destroy(Product $product){
+    public function destroy(Product $product, LocalFileUploader $localFileUploader){
         $product->delete();
-        // todo : delete image
+        if(isset($product->image)) {
+            $localFileUploader->deleteFile('products_images/' . $product->image);
+        }
         return SuccessResponse::send('Product Deleted Successfully');
     }
 }

@@ -13,7 +13,7 @@ use App\Models\Vendor;
 class CategoryController extends Controller
 {
 
-    public function index(Vendor $vendor){
+    public function getVendorCategories(Vendor $vendor){
         $categories = $vendor->categories()->paginate();
         return SuccessResponse::send('Categories List', CategoryResource::collection($categories), meta:[
             'pagination' => [
@@ -38,15 +38,12 @@ class CategoryController extends Controller
     }
 
     public function update(UpdateCategoryRequest $request, Category $category){
-        $category->update([
-            'name' => $request->name,
-        ]);
+        $category->update($request->validated());
         return SuccessResponse::send('Category Updated', CategoryResource::make($category));
     }
 
     public function destroy(Category $category){
         $category->delete();
-        return SuccessResponse::send('Category Deleted', CategoryResource::make($category));
+        return SuccessResponse::send('Category Deleted');
     }
-
 }

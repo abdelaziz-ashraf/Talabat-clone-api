@@ -14,7 +14,7 @@ use Illuminate\Validation\ValidationException;
 
 class AddressController extends Controller
 {
-    public function index() {
+    public function useAddresses() {
         $addresses = auth('vendor')->user()->addresses()->paginate();
         return SuccessResponse::send('success', AddressResource::collection($addresses), meta:[
             'pagination' => [
@@ -43,7 +43,6 @@ class AddressController extends Controller
     }
 
     public function toggleActive(Address $address) {
-
         $address->update([
             'active' => (!$address->active)
         ]);
