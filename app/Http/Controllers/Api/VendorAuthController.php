@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\GenerateVerificationCodeAction;
 use App\Actions\LocalFileUploader;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAddressRequest;
 use App\Http\Requests\SetPasswordRequest;
 use App\Http\Requests\VendorLoginRequest;
 use App\Http\Requests\VendorRegisterRequest;
+use App\Http\Resources\VendorRegisteredResource;
 use App\Http\Resources\VendorResource;
 use App\Http\Responses\SuccessResponse;
 use App\Models\Vendor;
+use App\Notifications\VerificationCodeNotification;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -35,7 +38,7 @@ class VendorAuthController extends Controller
             'longitude' => $address['longitude'],
         ]);
 
-        return SuccessResponse::send('Wait approving from Admin .. ', VendorResource::make($vendor));
+        return SuccessResponse::send('Wait approving from Admin .. ', VendorRegisteredResource::make($vendor));
     }
 
     public function login(VendorLoginRequest $request) {

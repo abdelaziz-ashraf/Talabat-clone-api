@@ -15,8 +15,10 @@ use Illuminate\Support\Facades\Hash;
 class VendorController extends Controller
 {
 
-    public function index() {
-        $vendors =  Vendor::paginate();
+    public function index(Request $request) {
+        $vendors =  Vendor::when($request->name, function ($query, $name) {
+            $query->where('name', 'like', "%$name%");
+        })->paginate();
         return SuccessResponse::send('All Vendors', VendorResource::collection($vendors), meta: [
             'pagination' => [
                 'total' => $vendors->total(),

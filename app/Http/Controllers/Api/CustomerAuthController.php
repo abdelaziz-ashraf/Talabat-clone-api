@@ -36,7 +36,7 @@ class CustomerAuthController extends Controller
     {
         $data = $request->validated();
         $customer = Customer::where('email', $data['email'])->first();
-        if ($customer->email_verified_at == null) {
+        if (!isset($customer->email_verified_at)) {
             throw ValidationException::withMessages(['please verify your email first.']);
         }
         if(!$customer || !Hash::check($data['password'], $customer->password)) {

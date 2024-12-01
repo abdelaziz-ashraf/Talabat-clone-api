@@ -8,14 +8,16 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Http\Responses\SuccessResponse;
-use App\Models\Category;
 use App\Models\Product;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index(){
-        $products = Product::paginate();
+    public function index(Request $request){
+        $products = Product::when($request->name, function ($query, $name) {
+            $query->where('name', 'like', "%$name%");
+        })->paginate();
+        
         return SuccessResponse::send('All Products', ProductResource::collection($products), meta: [
             'pagination' => [
                 'total' => $products->total(),

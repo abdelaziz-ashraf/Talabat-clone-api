@@ -16,6 +16,7 @@ class MenuResource extends JsonResource
     {
         return [
             'category' => CategoryResource::make($this),
+            'category_products' => ProductResource::collection($this->products),
         ];
     }
 }
