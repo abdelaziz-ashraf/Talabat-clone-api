@@ -5,9 +5,6 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Middleware\CheckOwnsAddressMiddleware;
 use Illuminate\Support\Facades\Route;
 
-require_once __DIR__ . '/api/vendor.php';
-require_once __DIR__ . '/api/customer.php';
-
 
 Route::middleware(['auth:vendor,customer'])->group(function () {
 
