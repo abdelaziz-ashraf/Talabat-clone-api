@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Customer;
+use App\Models\Vendor;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -17,10 +19,17 @@ class CheckOwnsAddressMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $address = $request->route('address');
-        if (auth('vendor')->id() !== $address->addressable_id) {
-            throw ValidationException::withMessages(['Unauthorized Access.']);
-        }
 
-        return $next($request);
+        $user = $user->user();
+        if (
+            in_array($user::class, [Vendor::class, Customer::class])
+            &&
+            ($user->id == $address->addressable_id)
+            &&
+            ($user::class == $address->addressable_type)
+        ) {
+            return $next($request);
+        }
+        throw ValidationException::withMessages(['Unauthorized Access.']);
     }
 }
