@@ -8,17 +8,38 @@ use App\Http\Requests\UpdateVendorRequest;
 use App\Http\Resources\MenuResource;
 use App\Http\Resources\VendorResource;
 use App\Http\Responses\SuccessResponse;
+use App\Models\Address;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class VendorController extends Controller
 {
 
     public function index(Request $request) {
-        $vendors =  Vendor::when($request->name, function ($query, $name) {
-            $query->where('name', 'like', "%$name%");
-        })->paginate();
+        $latitude = $request->latitude;
+        $longitude = $request->longitude;
+
+        $vendors = DB::table('vendors')
+            ->join('addresses', function ($join) {
+                $join->on('vendors.id', '=', 'addresses.addressable_id')
+                    ->where('addresses.addressable_type', Vendor::class);
+            })
+            ->selectRaw(
+                "vendors.*, addresses.address, addresses.city,
+            (6371 * acos(cos(radians(?)) * cos(radians(addresses.latitude))
+            * cos(radians(addresses.longitude) - radians(?))
+            + sin(radians(?)) * sin(radians(addresses.latitude)))) AS distance",
+                [$latitude, $longitude, $latitude]
+            )
+            ->having('distance', '<', 20)
+            ->orderBy('distance')
+            ->when($request->name, function ($query, $name) {
+                $query->where('vendors.name', 'like', "%$name%");
+            })
+            ->paginate();
+
         return SuccessResponse::send('All Vendors', VendorResource::collection($vendors), meta: [
             'pagination' => [
                 'total' => $vendors->total(),

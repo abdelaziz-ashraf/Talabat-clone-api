@@ -18,7 +18,7 @@ Route::prefix('vendor')->group(function () {
         Route::post('register', 'register');
         Route::post('login', 'login');
         Route::post('{vendor:code}/set-password', 'setPassword');
-    }); // Done.
+    });
 
     Route::controller(VendorController::class)->group(function () {
         Route::get('/', 'index');
