@@ -1,0 +1,81 @@
+<?php
+
+namespace App\Http\Controllers\Api\Vendor;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreAddressRequest;
+use App\Http\Requests\UpdateAddressRequest;
+use App\Http\Resources\AddressResource;
+use App\Http\Responses\SuccessResponse;
+use App\Models\Address;
+use App\Services\AddressService;
+use Illuminate\Validation\UnauthorizedException;
+use Illuminate\Validation\ValidationException;
+
+class AddressController extends Controller
+{
+    protected $addressService;
+    public function __construct(AddressService $addressService){
+        $this->addressService = $addressService;
+    }
+
+    public function index() {
+        $addresses = auth('vendor')->user()->addresses()->paginate();
+        return SuccessResponse::send('success', AddressResource::collection($addresses), meta:[
+            'pagination' => [
+                'total' => $addresses->total(),
+                'per_page' => $addresses->perPage(),
+                'current_page' => $addresses->currentPage(),
+                'last_page' => $addresses->lastPage(),
+            ]
+        ]);
+    }
+
+    public function vendorActiveAddresses() {
+        $addresses = auth('vendor')->user()->addresses()->where('active', true)->paginate();
+        return SuccessResponse::send('success', AddressResource::collection($addresses), meta:[
+            'pagination' => [
+                'total' => $addresses->total(),
+                'per_page' => $addresses->perPage(),
+                'current_page' => $addresses->currentPage(),
+                'last_page' => $addresses->lastPage(),
+            ]
+        ]);
+    }
+
+    public function store(StoreAddressRequest $request) {
+        $user = auth('vendor')->user();
+        $address = $user->addresses()->create($request->validated());
+        return SuccessResponse::send('Address added successfully.', AddressResource::make($address));
+    }
+
+    public function update(UpdateAddressRequest $request, Address $address) {
+        $address = $this->addressService->update($address, $request->validated());
+        return SuccessResponse::send('Address updated successfully.',
+            AddressResource::make($address)
+        );
+    }
+
+    public function destroy(Address $address) {
+        $vendor = auth('vendor')->user();
+        if (!($vendor->id == $address->addressable_id
+            && $vendor::class == $address->addressable_type)
+        ) {
+            throw new UnauthorizedException;
+        }
+        $this->addressService->destroy($address);
+        return SuccessResponse::send('Address deleted successfully.');
+    }
+
+    public function toggleActive(Address $address) {
+        $vendor = auth('vendor')->user();
+        if (!($vendor->id == $address->addressable_id
+            && $vendor::class == $address->addressable_type)
+        ) {
+            throw new UnauthorizedException;
+        }
+       $address = $this->addressService->toggleActive($address);
+        return SuccessResponse::send('Address Activation updated successfully.', AddressResource::make($address));
+    }
+
+}

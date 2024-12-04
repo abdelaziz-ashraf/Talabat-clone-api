@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -10,7 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Vendor extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    use HasApiTokens, Notifiable, HasFactory;
 
     protected $fillable = [
         'name', 'image', 'code', 'password'
@@ -32,5 +33,9 @@ class Vendor extends Authenticatable
 
     public function categories() {
         return $this->hasMany(Category::class);
+    }
+
+    public function products(){
+        return $this->hasManyThrough(Product::class, Category::class);
     }
 }

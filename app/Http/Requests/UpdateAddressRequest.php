@@ -2,7 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Customer;
+use App\Models\Vendor;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\UnauthorizedException;
+use Illuminate\Validation\ValidationException;
 
 class UpdateAddressRequest extends FormRequest
 {
@@ -11,9 +15,24 @@ class UpdateAddressRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        $address = $this->route('address');
+        $user = auth()->user();
+        if (!(
+                in_array($user::class, [Vendor::class, Customer::class])
+                &&
+                ($user->id == $address->addressable_id)
+                &&
+                ($user::class == $address->addressable_type)
+            )
+        ) {
+            return false;
+        }
         return true;
     }
 
+    protected function failedAuthorization() {
+        throw new UnauthorizedException;
+    }
     /**
      * Get the validation rules that apply to the request.
      *

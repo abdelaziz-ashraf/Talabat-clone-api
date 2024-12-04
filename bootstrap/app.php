@@ -1,11 +1,11 @@
 <?php
 
-use App\Http\Middleware\CheckOwnsAddressMiddleware;
 use App\Http\Responses\ErrorResponse;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Validation\UnauthorizedException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -40,6 +40,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->renderable(function (AuthenticationException $e, $request) {
             if ($request->is('api/*')) {
                 return ErrorResponse::send('unAuthenticated', ['Authentication Exception'], statusCode: 401);
+            }
+        });
+
+        $exceptions->renderable(function (UnauthorizedException $e, $request) {
+            if ($request->is('api/*')) {
+                return ErrorResponse::send('Unauthorized', ['Unauthorized Exception'], statusCode: 401);
             }
         });
     })->create();

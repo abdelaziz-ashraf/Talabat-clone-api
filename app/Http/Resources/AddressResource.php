@@ -16,12 +16,12 @@ class AddressResource extends JsonResource
     {
         return [
             'id' => (integer)$this->id,
-            'active' => (boolean) $this->active,
+            'active' => (boolean) (is_null($this->active) ? true : $this->active),
             'address' => (string) $this->address,
             'city' => (string) $this->city,
             'longitude' => (float) $this->longitude,
             'latitude' => (float) $this->latitude,
-            'creates_at' => $this->created_at
+            'created_at' => $this->created_at
         ];
     }
 }
