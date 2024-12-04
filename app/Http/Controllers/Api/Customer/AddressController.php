@@ -12,6 +12,7 @@ use App\Models\Customer;
 use App\Models\Vendor;
 use App\Services\AddressService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\UnauthorizedException;
 use Illuminate\Validation\ValidationException;
 
@@ -23,7 +24,10 @@ class AddressController extends Controller
     }
 
     public function index() {
-        $addresses = auth('customer')->user()->addresses()->paginate();
+        $addresses = Cache::remember('customer_addresses'.auth('customer')->id(), now()->addDay(), function() {
+            return auth('customer')->user()->addresses()->paginate();
+        });
+
         return SuccessResponse::send('success', AddressResource::collection($addresses), meta:[
             'pagination' => [
                 'total' => $addresses->total(),
@@ -49,11 +53,13 @@ class AddressController extends Controller
     public function store(StoreAddressRequest $request) {
         $user = auth('customer')->user();
         $address = $user->addresses()->create($request->validated());
+        Cache::forget('customer_addresses'.auth('customer')->id());
         return SuccessResponse::send('Address added successfully.', AddressResource::make($address));
     }
 
     public function update(UpdateAddressRequest $request, Address $address) {
         $address = $this->addressService->update($address, $request->validated());
+        Cache::forget('customer_addresses'.auth('customer')->id());
         return SuccessResponse::send('AddressService updated successfully.',
             AddressResource::make($address)
         );
@@ -67,6 +73,7 @@ class AddressController extends Controller
             throw new UnauthorizedException;
         }
         $this->addressService->destroy($address);
+        Cache::forget('customer_addresses'.auth('customer')->id());
         return SuccessResponse::send('Address deleted successfully.');
     }
 

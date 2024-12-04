@@ -8,13 +8,17 @@ use App\Http\Resources\ProductResource;
 use App\Http\Responses\SuccessResponse;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller
 {
     public function index(Request $request){
-        $products = Product::when($request->name, function ($query, $name) {
-            $query->where('name', 'like', "%$name%");
-        })->paginate();
+        $customer_id = auth('customer')->id();
+        $products = Cache::remember("products-{$customer_id}}", now()->addHours(5), function() use ($request){
+            return Product::when($request->name, function ($query, $name) {
+                $query->where('name', 'like', "%$name%");
+            })->paginate();
+        });
 
         return SuccessResponse::send('All Products', ProductResource::collection($products), meta: [
             'pagination' => [

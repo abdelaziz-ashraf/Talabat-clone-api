@@ -19,6 +19,7 @@ class AddressController extends Controller
         $this->addressService = $addressService;
     }
 
+    /*
     public function index() {
         $addresses = auth('vendor')->user()->addresses()->paginate();
         return SuccessResponse::send('success', AddressResource::collection($addresses), meta:[
@@ -42,10 +43,10 @@ class AddressController extends Controller
             ]
         ]);
     }
-
+    */
     public function store(StoreAddressRequest $request) {
         $user = auth('vendor')->user();
-        $address = $user->addresses()->create($request->validated());
+        $address = $user->address()->updateOrCreate($request->validated());
         return SuccessResponse::send('Address added successfully.', AddressResource::make($address));
     }
 

@@ -25,11 +25,15 @@ class Vendor extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function address()
+    {
+        return $this->morphTo(Address::class, 'addressable');
+    }
 
-    public function addresses()
+    /*public function addresses()
     {
         return $this->morphMany(Address::class, 'addressable');
-    }
+    }*/
 
     public function categories() {
         return $this->hasMany(Category::class);

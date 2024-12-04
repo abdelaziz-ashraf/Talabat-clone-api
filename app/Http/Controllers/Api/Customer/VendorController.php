@@ -3,38 +3,29 @@
 namespace App\Http\Controllers\Api\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Customer\VendorsSearchResource;
 use App\Http\Resources\MenuResource;
 use App\Http\Resources\VendorResource;
 use App\Http\Responses\SuccessResponse;
+use App\Models\Address;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class VendorController extends Controller
 {
     public function index(Request $request) {
         $latitude = $request->latitude;
         $longitude = $request->longitude;
-        $vendors = DB::table('vendors')
-            ->join('addresses', function ($join) {
-                $join->on('vendors.id', '=', 'addresses.addressable_id')
-                    ->where('addresses.addressable_type', Vendor::class);
-            })
-            ->selectRaw(
-                "vendors.*, addresses.address, addresses.city,
-            (6371 * acos(cos(radians(?)) * cos(radians(addresses.latitude))
-            * cos(radians(addresses.longitude) - radians(?))
-            + sin(radians(?)) * sin(radians(addresses.latitude)))) AS distance",
-                [$latitude, $longitude, $latitude]
-            )
-            ->having('distance', '<', 50)
-            ->orderBy('distance')
-            ->when($request->name, function ($query, $name) {
-                $query->where('vendors.name', 'like', "%$name%");
-            })
-            ->paginate();
+        $radius = request('radius', 100);
 
-        return SuccessResponse::send('All Vendors', VendorResource::collection($vendors), meta: [
+        $cacheKey = "vendors_nearby:lat={$latitude}:long={$longitude}:radius={$radius}";
+        $vendors = Cache::remember($cacheKey, now()->addMinutes(30), function () use ($latitude, $longitude, $radius) {
+            $addressableIds = Address::vendorsWithinDistance($latitude, $longitude, $radius);
+            return Vendor::with('address')->whereIn('id', $addressableIds)->paginate();
+        });
+
+        return SuccessResponse::send('All Vendors', VendorsSearchResource::collection($vendors), meta: [
             'pagination' => [
                 'total' => $vendors->total(),
                 'current_page' => $vendors->currentPage(),

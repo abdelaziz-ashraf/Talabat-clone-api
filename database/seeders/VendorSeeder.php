@@ -16,7 +16,7 @@ class VendorSeeder extends Seeder
      */
     public function run(): void
     {
-        Vendor::factory(50)
+        Vendor::factory(70)
             ->has(Category::factory(3)
                 ->has(Product::factory(5), 'products'), 'categories')
             ->create()
@@ -27,16 +27,5 @@ class VendorSeeder extends Seeder
                 ]);
             });
 
-        Vendor::factory(10)
-            ->has(Category::factory(3)
-                ->has(Product::factory(5))
-            )
-            ->create()
-            ->each(function ($vendor) {
-                Address::factory(2)->create([
-                    'addressable_id' => $vendor->id,
-                    'addressable_type' => Vendor::class,
-                ]);
-            });
     }
 }

@@ -26,8 +26,6 @@ Route::prefix('vendors')->group(function () {
         Route::prefix('addresses')
             ->controller(\App\Http\Controllers\Api\Vendor\AddressController::class)
             ->group(function () {
-                Route::get('/', 'index');
-                Route::get('/active', 'vendorActiveAddresses');
                 Route::post('/', 'store');
                 Route::put('/{address}', 'update');
                 Route::delete('/{address}', 'destroy');

@@ -20,8 +20,8 @@ class AddressFactory extends Factory
         return [
             'address' => $this->faker->address,
             'city' => $this->faker->city,
-            'latitude' => $this->faker->latitude(-90, 90),
-            'longitude' => $this->faker->longitude(-180, 180),
+            'latitude' => $this->faker->latitude(-20, 20),
+            'longitude' => $this->faker->longitude(-50, 50),
             'addressable_id' => null,
             'addressable_type' => null,
             'active' => $this->faker->boolean,
