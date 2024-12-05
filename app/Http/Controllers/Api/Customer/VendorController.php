@@ -11,18 +11,27 @@ use App\Models\Address;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 
 class VendorController extends Controller
 {
     public function index(Request $request) {
         $latitude = $request->latitude;
         $longitude = $request->longitude;
-        $radius = request('radius', 100);
+        $radius = request('radius', 20);
 
         $cacheKey = "vendors_nearby:lat={$latitude}:long={$longitude}:radius={$radius}";
         $vendors = Cache::remember($cacheKey, now()->addMinutes(30), function () use ($latitude, $longitude, $radius) {
-            $addressableIds = Address::vendorsWithinDistance($latitude, $longitude, $radius);
-            return Vendor::with('address')->whereIn('id', $addressableIds)->paginate();
+            // using equation:
+            //$vendorsIds = Address::vendorsWithinDistance($latitude, $longitude, $radius);
+
+            // using redis
+            $vendorsIds = Redis::command('georadius', [
+                'vendors-locations',
+                $longitude, $latitude, $radius, 'km'
+            ]);
+
+            return Vendor::with('address')->whereIn('id', $vendorsIds)->paginate();
         });
 
         return SuccessResponse::send('All Vendors', VendorsSearchResource::collection($vendors), meta: [
