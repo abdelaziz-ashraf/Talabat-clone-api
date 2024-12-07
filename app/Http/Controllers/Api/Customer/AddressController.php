@@ -24,10 +24,7 @@ class AddressController extends Controller
     }
 
     public function index() {
-        $addresses = Cache::remember('customer_addresses'.auth('customer')->id(), now()->addDay(), function() {
-            return auth('customer')->user()->addresses()->paginate();
-        });
-
+        $addresses = auth('customer')->user()->addresses()->paginate();
         return SuccessResponse::send('success', AddressResource::collection($addresses), meta:[
             'pagination' => [
                 'total' => $addresses->total(),

@@ -10,13 +10,18 @@ use App\Http\Resources\ProductResource;
 use App\Http\Responses\SuccessResponse;
 use App\Models\Product;
 use App\Models\Vendor;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Validation\UnauthorizedException;
 use Illuminate\Validation\ValidationException;
 
 class ProductController extends Controller
 {
     public function index(Vendor $vendor){
-        $products = $vendor->products()->paginate();
+        $products = Cache::remember("vendor-{$vendor->id}-products", now()->addHours(5), function () use ($vendor) {
+            return $vendor->products()->paginate();
+        });
+
         return SuccessResponse::send('All Products', ProductResource::collection($products), meta: [
             'pagination' => [
                 'total' => $products->total(),
@@ -40,6 +45,7 @@ class ProductController extends Controller
             ? $localFileUploader->upload($request->file('image'), 'products_images')
             : null;
         $product = Product::create($data);
+        Cache::forget("vendor-{$product->category->vendor_id}-products");
         return SuccessResponse::send('Product Added Successfully', ProductResource::make($product), 201);
     }
 
@@ -49,6 +55,7 @@ class ProductController extends Controller
             $data['image'] = $localFileUploader->upload($request->file('image'), 'products_images', $product->image ?? null);
         }
         $product->update($data);
+        Cache::forget("vendor-{$product->category->vendor_id}-products");
         return SuccessResponse::send('Product Updated', ProductResource::make($product));
     }
 
@@ -58,6 +65,7 @@ class ProductController extends Controller
             throw new UnauthorizedException;
         }
         $product->delete();
+        Cache::forget("vendor-{$product->category->vendor_id}-products");
         if(isset($product->image)) {
             $localFileUploader->deleteFile('products_images/' . $product->image);
         }
