@@ -15,7 +15,9 @@ class VendorsSearchResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => (integer)$this->id,
+            'id' => (integer)$this->vendor_id,
+            'longitude' => $this->longitude,
+            'latitude' => $this->latitud,
             'name' => (string) $this->name,
             'image' => (string) $this->image,
         ];

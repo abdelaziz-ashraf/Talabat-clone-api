@@ -20,28 +20,21 @@ class VendorController extends Controller
         $longitude = $request->longitude;
         $radius = request('radius', 20);
 
-        $cacheKey = "vendors_nearby:lat={$latitude}:long={$longitude}:radius={$radius}";
+        /*
+        $cacheKey = "vendors_nearby:lat={$latitude}:long={$longitude}:radius={$radius}"; // todo: change the key ..
         $vendors = Cache::remember($cacheKey, now()->addMinutes(30), function () use ($latitude, $longitude, $radius) {
-            // using equation:
-            //$vendorsIds = Address::vendorsWithinDistance($latitude, $longitude, $radius);
-
-            // using redis
-            $vendorsIds = Redis::command('georadius', [
-                'vendors-locations',
-                $longitude, $latitude, $radius, 'km'
-            ]);
-
+            $vendorsIds = Address::vendorsWithinDistance($latitude, $longitude, $radius);
             return Vendor::with('address')->whereIn('id', $vendorsIds)->paginate();
         });
+        */
 
-        return SuccessResponse::send('All Vendors', VendorsSearchResource::collection($vendors), meta: [
-            'pagination' => [
-                'total' => $vendors->total(),
-                'current_page' => $vendors->currentPage(),
-                'per_page' => $vendors->perPage(),
-                'last_page' => $vendors->lastPage(),
-            ]
+        $vendors = Redis::command('georadius', [
+            'vendors-locations',
+            $longitude, $latitude, $radius, 'km'
         ]);
+
+        // todo : paginate result
+        return SuccessResponse::send('All Vendors', VendorsSearchResource::collection($vendors));
     }
 
     public function show(Vendor $vendor) {

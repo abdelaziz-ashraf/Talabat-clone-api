@@ -44,9 +44,6 @@ Route::prefix('customers')->group(function () {
                         Route::get('/{vendor}/categories', 'getVendorCategories');
                         Route::get('/categories/{category}', 'show');
                     });
-
-
-
             });
 
         Route::prefix('products')

@@ -11,7 +11,8 @@ Route::get('/vendors-geoadd', function () {
             'longitude' => $address->longitude,
             'latitude' => $address->latitude,
             'vendor_id' => $address->addressable_id,
+            'image' => $address->addressable->image,
+            'name' => $addresses->addressable->name,
         ]);
     }
-    dd(\Illuminate\Support\Facades\Redis::command('zrange', ['vendors-locations', 0, -1]));
 });

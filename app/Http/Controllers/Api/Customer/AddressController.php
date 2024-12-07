@@ -53,13 +53,11 @@ class AddressController extends Controller
     public function store(StoreAddressRequest $request) {
         $user = auth('customer')->user();
         $address = $user->addresses()->create($request->validated());
-        Cache::forget('customer_addresses'.auth('customer')->id());
         return SuccessResponse::send('Address added successfully.', AddressResource::make($address));
     }
 
     public function update(UpdateAddressRequest $request, Address $address) {
         $address = $this->addressService->update($address, $request->validated());
-        Cache::forget('customer_addresses'.auth('customer')->id());
         return SuccessResponse::send('AddressService updated successfully.',
             AddressResource::make($address)
         );
@@ -73,7 +71,6 @@ class AddressController extends Controller
             throw new UnauthorizedException;
         }
         $this->addressService->destroy($address);
-        Cache::forget('customer_addresses'.auth('customer')->id());
         return SuccessResponse::send('Address deleted successfully.');
     }
 
