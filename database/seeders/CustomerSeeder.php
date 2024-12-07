@@ -14,7 +14,7 @@ class CustomerSeeder extends Seeder
      */
     public function run(): void
     {
-        Customer::factory(10)
+        Customer::factory(2200)
             ->create()
             ->each(function ($customer) {
                 Address::factory(2)->create([

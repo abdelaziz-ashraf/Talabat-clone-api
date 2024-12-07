@@ -16,7 +16,7 @@ class VendorSeeder extends Seeder
      */
     public function run(): void
     {
-        Vendor::factory(70)
+        Vendor::factory(1000000)
             ->has(Category::factory(3)
                 ->has(Product::factory(5), 'products'), 'categories')
             ->create()
