@@ -32,8 +32,6 @@ class VendorController extends Controller
             'vendors-locations',
             $longitude, $latitude, $radius, 'km'
         ]);
-
-        // todo : paginate result
         return SuccessResponse::send('All Vendors', VendorsSearchResource::collection($vendors));
     }
 

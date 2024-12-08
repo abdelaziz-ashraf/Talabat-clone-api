@@ -52,5 +52,28 @@ Route::prefix('customers')->group(function () {
                 Route::get('/', 'index');
                 Route::get('/{product}', 'show');
             });
+
+        Route::prefix('carts')
+            ->controller(\App\Http\Controllers\Api\Customer\CartController::class)
+            ->group(function () {
+                Route::get('/my-cart', 'show');
+                Route::post('/', 'addToCart');
+                Route::delete('/clear', 'clearCart');
+                Route::post('/checkout', 'checkout');
+            });
+
+        Route::prefix('carts/cart-item')
+            ->controller(\App\Http\Controllers\Api\Customer\CartItemController::class)
+            ->group(function () {
+                Route::put('{cartItem}/change-quantity', 'changeQuantity');
+                Route::delete('{cartItem}', 'destroy');
+            });
+
+        Route::prefix('orders')
+            ->controller(\App\Http\Controllers\Api\Customer\OrderController::class)
+            ->group(function () {
+                Route::get('/', 'index');
+                Route::get('/{order}', 'show');
+            });
     });
 });
