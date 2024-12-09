@@ -51,5 +51,13 @@ Route::prefix('vendors')->group(function () {
                 Route::put('/{product}', 'update');
                 Route::delete('/{product}', 'destroy');
             });
+
+        Route::prefix('orders')
+            ->controller(\App\Http\Controllers\Api\Vendor\OrderController::class)
+            ->group(function () {
+                Route::get('/', 'index');
+                Route::get('/{order}', 'show');
+                Route::put('/{order}/change-status', 'changeStatus');
+            });
     });
 });
