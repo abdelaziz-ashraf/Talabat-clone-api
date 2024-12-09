@@ -11,4 +11,13 @@ Route::prefix('delivery')->group(function () {
             Route::post('verify-account', 'verifyAccount');
         });
 
+    Route::middleware(['auth:delivery'])->group(function () {
+        Route::prefix('profile')
+            ->controller(\App\Http\Controllers\Api\Delivery\DeliveryProfileController::class)
+            ->group(function () {
+            Route::get('/my-profile', 'show');
+            Route::put('/', 'update');
+            Route::delete('/', 'delete');
+        });
+    });
 });

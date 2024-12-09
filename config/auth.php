@@ -86,7 +86,7 @@ return [
         ],
         'deliveries' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Delivery::class,
+            'model' => App\Models\DeliveryPeople::class,
         ]
     ],
 
