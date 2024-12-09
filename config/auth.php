@@ -48,6 +48,10 @@ return [
             'driver' => 'sanctum',
             'provider' => 'customers',
         ],
+        'delivery' => [
+            'driver' => 'sanctum',
+            'provider' => 'deliveries',
+        ],
     ],
 
     /*
@@ -72,12 +76,6 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
-
         'vendors' => [
             'driver' => 'eloquent',
             'model' => App\Models\Vendor::class,
@@ -85,8 +83,11 @@ return [
         'customers' => [
             'driver' => 'eloquent',
             'model' => App\Models\Customer::class,
+        ],
+        'deliveries' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Delivery::class,
         ]
-
     ],
 
     /*
